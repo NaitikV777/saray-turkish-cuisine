@@ -8,13 +8,17 @@ import { menuSections } from '../src/data/menu.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const port = Number(process.env.PORT || 5174);
+const port = Number(process.env.PORT || 3000);
 const staffPin = process.env.STAFF_PIN || '2468';
 const reservationsFile = path.join(__dirname, 'data', 'reservations.json');
 const distPath = path.join(__dirname, '..', 'dist');
 
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+app.get('/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
 
 async function ensureReservationsFile() {
   await fs.mkdir(path.dirname(reservationsFile), { recursive: true });

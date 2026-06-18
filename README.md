@@ -19,8 +19,8 @@ npm.cmd run start
 
 Open:
 
-- Customer site: http://127.0.0.1:5174
-- Staff site: http://127.0.0.1:5174/staff
+- Customer site: http://127.0.0.1:3000
+- Staff site: http://127.0.0.1:3000/staff
 
 Default staff PIN:
 
@@ -53,8 +53,10 @@ Node version: 22.x
 Install command: npm install
 Build command: npm run build
 Start command: npm run start
-Entry file: server/index.js
+Entry file: index.js
 ```
+
+If Hostinger asks for a port, use `3000`. The app also supports a platform-provided `PORT` environment variable.
 
 Before real restaurant launch, replace the local JSON reservation file with a real database such as Supabase Postgres, Hostinger MySQL, Neon Postgres, or MongoDB Atlas. A JSON file is fine for demo/testing, but a database is safer for backups, concurrent users, and redeploys.
 
