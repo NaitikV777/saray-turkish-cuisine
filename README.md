@@ -42,6 +42,18 @@ Set a private staff PIN before production:
 STAFF_PIN=choose-a-secure-pin
 ```
 
+For production reservations, create a Hostinger MySQL database and add these variables in Hostinger:
+
+```text
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=your_hostinger_database_user
+DB_PASSWORD=your_hostinger_database_password
+DB_NAME=your_hostinger_database_name
+```
+
+When these database variables are present, the app stores reservations in MySQL and creates the `reservations` table automatically. Without them, it falls back to `server/data/reservations.json` for local development.
+
 ## Hostinger Deployment Notes
 
 Use Hostinger Business Web Hosting or Cloud hosting with Node.js Web Apps.
@@ -58,7 +70,7 @@ Entry file: app.cjs
 
 If Hostinger asks for a port, use `3000`. The app also supports a platform-provided `PORT` environment variable.
 
-Before real restaurant launch, replace the local JSON reservation file with a real database such as Supabase Postgres, Hostinger MySQL, Neon Postgres, or MongoDB Atlas. A JSON file is fine for demo/testing, but a database is safer for backups, concurrent users, and redeploys.
+Before real restaurant launch, set the Hostinger MySQL environment variables so reservations are saved to the database. A JSON file is fine for local demo/testing, but MySQL is safer for backups, concurrent users, and redeploys.
 
 ## Production Checklist
 

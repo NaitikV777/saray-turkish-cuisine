@@ -5,41 +5,29 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { menuSections } from '../src/data/menu.js';
+import {
+  findReservationByReference,
+  getReservationStoreName,
+  initializeReservationStore,
+  listReservations,
+  listReservationsByPhone,
+  saveReservation,
+  updateReservationStatus,
+} from './reservationsStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '0.0.0.0';
 const staffPin = process.env.STAFF_PIN || '2468';
-const reservationsFile = path.join(__dirname, 'data', 'reservations.json');
 const distPath = path.join(__dirname, '..', 'dist');
 
 app.use(cors({ origin: true }));
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', reservations: getReservationStoreName() });
 });
-
-async function ensureReservationsFile() {
-  await fs.mkdir(path.dirname(reservationsFile), { recursive: true });
-
-  try {
-    await fs.access(reservationsFile);
-  } catch {
-    await fs.writeFile(reservationsFile, '[]', 'utf8');
-  }
-}
-
-async function readReservations() {
-  await ensureReservationsFile();
-  const raw = await fs.readFile(reservationsFile, 'utf8');
-  return JSON.parse(raw || '[]');
-}
-
-async function writeReservations(reservations) {
-  await fs.writeFile(reservationsFile, JSON.stringify(reservations, null, 2), 'utf8');
-}
 
 function normalizePhone(phone) {
   const digits = String(phone || '').replace(/\D/g, '');
@@ -102,13 +90,12 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ error: 'Enter a valid mobile number.' });
   }
 
-  const reservations = await readReservations();
-  const customerReservations = sortReservations(reservations).filter((reservation) => reservation.phone === phone);
+  const customerReservations = sortReservations(await listReservationsByPhone(phone));
   res.json({ phone, reservations: customerReservations });
 });
 
 app.post('/api/reservations', async (req, res) => {
-  const reservations = await readReservations();
+  const reservations = await listReservations();
   const name = String(req.body.name || '').trim();
   const phone = normalizePhone(req.body.phone);
   const date = String(req.body.date || '').trim();
@@ -135,15 +122,13 @@ app.post('/api/reservations', async (req, res) => {
     updatedAt: new Date().toISOString(),
   };
 
-  reservations.push(reservation);
-  await writeReservations(reservations);
+  await saveReservation(reservation);
 
   res.status(201).json({ reservation });
 });
 
 app.patch('/api/reservations/:reference/cancel', async (req, res) => {
-  const reservations = await readReservations();
-  const reservation = reservations.find((item) => item.reference === req.params.reference);
+  const reservation = await findReservationByReference(req.params.reference);
 
   if (!reservation) {
     return res.status(404).json({ error: 'Reservation not found.' });
@@ -156,12 +141,15 @@ app.patch('/api/reservations/:reference/cancel', async (req, res) => {
     return res.status(403).json({ error: 'This reservation belongs to a different mobile number.' });
   }
 
-  reservation.status = 'cancelled';
-  reservation.cancelledAt = new Date().toISOString();
-  reservation.updatedAt = new Date().toISOString();
-  await writeReservations(reservations);
+  const cancelledAt = new Date().toISOString();
+  const updatedReservation = await updateReservationStatus(
+    req.params.reference,
+    'cancelled',
+    cancelledAt,
+    cancelledAt,
+  );
 
-  res.json({ reservation });
+  res.json({ reservation: updatedReservation });
 });
 
 app.get('/api/staff/reservations', async (req, res) => {
@@ -169,7 +157,7 @@ app.get('/api/staff/reservations', async (req, res) => {
     return;
   }
 
-  const reservations = sortReservations(await readReservations());
+  const reservations = sortReservations(await listReservations());
   res.json({ reservations });
 });
 
@@ -185,16 +173,17 @@ app.patch('/api/staff/reservations/:reference', async (req, res) => {
     return res.status(400).json({ error: 'Choose a valid reservation status.' });
   }
 
-  const reservations = await readReservations();
-  const reservation = reservations.find((item) => item.reference === req.params.reference);
+  const updatedAt = new Date().toISOString();
+  const reservation = await updateReservationStatus(
+    req.params.reference,
+    nextStatus,
+    updatedAt,
+    nextStatus === 'cancelled' ? updatedAt : undefined,
+  );
 
   if (!reservation) {
     return res.status(404).json({ error: 'Reservation not found.' });
   }
-
-  reservation.status = nextStatus;
-  reservation.updatedAt = new Date().toISOString();
-  await writeReservations(reservations);
 
   res.json({ reservation });
 });
@@ -217,8 +206,8 @@ app.use((error, _req, res, _next) => {
 const server = app.listen(port, host, () => {
   console.log(`Saray API running on http://${host}:${port}`);
 
-  ensureReservationsFile().catch((error) => {
-    console.error('Unable to initialize reservations file:', error);
+  initializeReservationStore().catch((error) => {
+    console.error('Unable to initialize reservations storage:', error);
   });
 });
 
