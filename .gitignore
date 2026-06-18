@@ -1,0 +1,9 @@
+node_modules/
+dist/
+tmp/
+output/
+.vscode/
+.env
+server/data/reservations.json
+*.log
+*.exe
