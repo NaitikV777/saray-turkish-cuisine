@@ -12,6 +12,7 @@
     "client": "vite --host 127.0.0.1",
     "server": "node --watch server/index.js",
     "start": "node app.js",
+    "postinstall": "npm run build",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },

@@ -51,7 +51,7 @@ Recommended settings:
 ```text
 Node version: 22.x
 Install command: npm install
-Build command: npm run build
+Build command: Not needed if Hostinger does not show this field. The app builds automatically after `npm install`.
 Start command: npm run start
 Entry file: app.js
 ```
