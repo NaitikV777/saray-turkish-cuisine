@@ -53,7 +53,7 @@ Node version: 22.x
 Install command: npm install
 Build command: npm run build
 Start command: npm run start
-Entry file: index.js
+Entry file: app.js
 ```
 
 If Hostinger asks for a port, use `3000`. The app also supports a platform-provided `PORT` environment variable.
