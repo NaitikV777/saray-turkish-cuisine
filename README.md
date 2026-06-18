@@ -53,7 +53,7 @@ Node version: 22.x
 Install command: npm install
 Build command: Not needed if Hostinger does not show this field. The app builds automatically after `npm install`.
 Start command: npm run start
-Entry file: app.js
+Entry file: app.cjs
 ```
 
 If Hostinger asks for a port, use `3000`. The app also supports a platform-provided `PORT` environment variable.

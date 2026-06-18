@@ -9,6 +9,7 @@ import { menuSections } from '../src/data/menu.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const host = process.env.HOST || '0.0.0.0';
 const staffPin = process.env.STAFF_PIN || '2468';
 const reservationsFile = path.join(__dirname, 'data', 'reservations.json');
 const distPath = path.join(__dirname, '..', 'dist');
@@ -208,8 +209,20 @@ try {
   // Vite serves the app during development. Static files are registered after `npm run build`.
 }
 
-await ensureReservationsFile();
+app.use((error, _req, res, _next) => {
+  console.error('Saray API error:', error);
+  res.status(500).json({ error: 'Server error.' });
+});
 
-app.listen(port, () => {
-  console.log(`Saray API running on http://127.0.0.1:${port}`);
+const server = app.listen(port, host, () => {
+  console.log(`Saray API running on http://${host}:${port}`);
+
+  ensureReservationsFile().catch((error) => {
+    console.error('Unable to initialize reservations file:', error);
+  });
+});
+
+server.on('error', (error) => {
+  console.error('Failed to bind Saray API server:', error);
+  process.exit(1);
 });
