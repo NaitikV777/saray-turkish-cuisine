@@ -42,7 +42,16 @@ Set a private staff PIN before production:
 STAFF_PIN=choose-a-secure-pin
 ```
 
-For production reservations, create a Hostinger MySQL database and add these variables in Hostinger:
+For production reservations, connect a Supabase PostgreSQL database from Hostinger's database connector. The app supports a PostgreSQL connection string from any of these variables:
+
+```text
+DATABASE_URL=postgresql://...
+POSTGRES_URL=postgresql://...
+SUPABASE_DB_URL=postgresql://...
+SUPABASE_DATABASE_URL=postgresql://...
+```
+
+If Hostinger MySQL is available on your plan, the app also supports:
 
 ```text
 DB_HOST=localhost
@@ -52,7 +61,7 @@ DB_PASSWORD=your_hostinger_database_password
 DB_NAME=your_hostinger_database_name
 ```
 
-When these database variables are present, the app stores reservations in MySQL and creates the `reservations` table automatically. Without them, it falls back to `server/data/reservations.json` for local development.
+When these database variables are present, the app stores reservations in the database and creates the `reservations` table automatically. Without them, it falls back to `server/data/reservations.json` for local development.
 
 ## Hostinger Deployment Notes
 
@@ -70,7 +79,7 @@ Entry file: app.cjs
 
 If Hostinger asks for a port, use `3000`. The app also supports a platform-provided `PORT` environment variable.
 
-Before real restaurant launch, set the Hostinger MySQL environment variables so reservations are saved to the database. A JSON file is fine for local demo/testing, but MySQL is safer for backups, concurrent users, and redeploys.
+Before real restaurant launch, set the Supabase/PostgreSQL or Hostinger MySQL environment variables so reservations are saved to the database. A JSON file is fine for local demo/testing, but a real database is safer for backups, concurrent users, and redeploys.
 
 ## Production Checklist
 
