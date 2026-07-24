@@ -620,7 +620,6 @@ function StaffSite() {
           <section className="staff-login-card" data-animate>
             <ShieldCheck />
             <h2>Enter staff PIN</h2>
-            <p>Default local PIN is 2468. Change it in `.env` with `STAFF_PIN` before real use.</p>
             <form onSubmit={handleStaffLogin} className="login-row">
               <input
                 value={pin}
