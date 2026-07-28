@@ -305,20 +305,22 @@ function CustomerSite() {
               <div className="menu-items">
                 {activeSection.items.map((item) => (
                   <article className="menu-item" key={item.name}>
-                    <img
-                      className="menu-item-image"
-                      src={getItemImage(item.name)}
-                      alt={`${item.name} at Saray Turkish Cuisine`}
-                      loading="lazy"
-                      onError={(event) => {
-                        event.currentTarget.src = activeImage;
-                      }}
-                    />
+                    <div className="menu-item-media">
+                      <img
+                        className="menu-item-image"
+                        src={getItemImage(item.name)}
+                        alt={`${item.name} at Saray Turkish Cuisine`}
+                        loading="lazy"
+                        onError={(event) => {
+                          event.currentTarget.src = activeImage;
+                        }}
+                      />
+                      <span className="menu-price">{formatPrice(item.price)}</span>
+                    </div>
                     <div className="menu-item-body">
                       <h4>{item.name}</h4>
                       <p>{item.description}</p>
                     </div>
-                    <span className="menu-price">{formatPrice(item.price)}</span>
                   </article>
                 ))}
               </div>

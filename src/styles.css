@@ -584,7 +584,14 @@ a {
   animation: liftIn 280ms ease both;
 }
 
+.menu-item-media {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .menu-item-image {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -592,12 +599,17 @@ a {
   transition: transform 360ms ease;
 }
 
-.menu-item:hover .menu-item-image {
-  transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .menu-item:hover .menu-item-image {
+    transform: scale(1.04);
+  }
 }
 
 .menu-item-body {
+  position: relative;
+  z-index: 1;
   padding: 16px;
+  background: rgba(255, 251, 243, 0.94);
 }
 
 .menu-item h4,
@@ -617,6 +629,7 @@ a {
 .menu-price {
   position: absolute;
   inset: 12px 12px auto auto;
+  z-index: 2;
   border-radius: 999px;
   padding: 7px 10px;
   color: var(--maroon-950);
